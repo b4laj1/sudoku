@@ -10,7 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/puzzle/:orgId" element={<Puzzle />} />
-        <Route path="/leaderboard/:puzzleId" element={<Leaderboard />} />
+        <Route path="/leaderboard/:puzzleType/:puzzleIndex" element={<Leaderboard />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>

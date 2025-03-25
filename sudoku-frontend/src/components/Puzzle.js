@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import SudokuPuzzle from './puzzles/SudokuPuzzle';
+import AnagramPuzzle from './puzzles/AnagramPuzzle';
+import McqPuzzle from './puzzles/McqPuzzle';
 
 function Puzzle() {
   const { orgId } = useParams();
   const navigate = useNavigate();
-  const [puzzle, setPuzzle] = useState(null);
-  const [solution, setSolution] = useState([]);
-  const [puzzleId, setPuzzleId] = useState(null);
+  const [puzzleData, setPuzzleData] = useState(null);
+  const [solution, setSolution] = useState(null);
   const [timer, setTimer] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -15,11 +17,15 @@ function Puzzle() {
     fetch(`http://localhost:5000/api/puzzle?orgId=${orgId}`)
       .then(res => res.json())
       .then(data => {
-        setPuzzle(data.puzzle);
-        setPuzzleId(data.id);
-        // Initialize solution grid from puzzle
-        const initialSolution = data.puzzle.map(row => [...row]);
-        setSolution(initialSolution);
+        setPuzzleData(data);
+        // Initialize solution based on puzzle type
+        if (data.type === 'SUDOKU') {
+          setSolution(data.puzzle.grid.map(row => [...row]));
+        } else if (data.type === 'ANAGRAM') {
+          setSolution('');
+        } else if (['MATH_MCQ', 'DEV_TRIVIA'].includes(data.type)) {
+          setSolution(null);
+        }
         setLoading(false);
       })
       .catch(err => console.error('Error fetching puzzle:', err));
@@ -35,19 +41,13 @@ function Puzzle() {
     }
   }, [loading]);
 
-  const handleCellChange = (rowIndex, colIndex, value) => {
-    const newValue = value === '' ? 0 : Math.min(9, Math.max(1, parseInt(value) || 0));
-    const newSolution = [...solution];
-    newSolution[rowIndex][colIndex] = newValue;
-    setSolution(newSolution);
-  };
-
   const handleSubmit = () => {
     fetch('http://localhost:5000/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        puzzleId,
+        type: puzzleData.type,
+        puzzle_index: puzzleData.puzzle_index,
         orgId,
         solution,
         time: timer
@@ -55,8 +55,8 @@ function Puzzle() {
     })
       .then(res => res.json())
       .then(data => {
-        if (true || data.correct) {
-          navigate(`/leaderboard/${puzzleId}`);
+        if (data.correct) {
+          navigate(`/leaderboard/${puzzleData.type}/${puzzleData.puzzle_index}`);
         } else {
           alert('Solution is incorrect! Try again.');
         }
@@ -64,39 +64,58 @@ function Puzzle() {
       .catch(err => console.error('Error submitting solution:', err));
   };
 
-  if (loading) return <div>Loading puzzle...</div>;
-
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  if (loading) return <div>Loading puzzle...</div>;
+
+  const renderPuzzle = () => {
+    switch (puzzleData.type) {
+      case 'SUDOKU':
+        return (
+          <SudokuPuzzle
+            puzzle={puzzleData.puzzle.grid}
+            solution={solution}
+            onSolutionChange={setSolution}
+          />
+        );
+      case 'ANAGRAM':
+        return (
+          <AnagramPuzzle
+            scrambledWord={puzzleData.puzzle.scrambled}
+            hint={puzzleData.puzzle.hint}
+            solution={solution}
+            onSolutionChange={setSolution}
+          />
+        );
+      case 'MATH_MCQ':
+      case 'DEV_TRIVIA':
+        return (
+          <McqPuzzle
+            question={puzzleData.puzzle.question}
+            options={puzzleData.puzzle.options}
+            selectedAnswer={solution}
+            onAnswerSelect={setSolution}
+          />
+        );
+      default:
+        return <div>Unknown puzzle type</div>;
+    }
+  };
+
   return (
     <div className="container">
-      <h1>Sudoku Challenge</h1>
+      <h1>{puzzleData.type.replace('_', ' ')} Challenge</h1>
       <div className="timer">Time: {formatTime(timer)}</div>
-      <div className="puzzle-grid">
-        {solution.map((row, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {row.map((cell, colIndex) => (
-              <input
-                key={`${rowIndex}-${colIndex}`}
-                type="number"
-                min="1"
-                max="9"
-                value={cell || ''}
-                onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
-                disabled={puzzle[rowIndex][colIndex] !== 0}
-                className={puzzle[rowIndex][colIndex] !== 0 ? 'fixed' : ''}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-      <button onClick={handleSubmit}>Submit Solution</button>
+      {renderPuzzle()}
+      <button onClick={handleSubmit} className="submit-button">
+        Submit Solution
+      </button>
     </div>
   );
 }
 
-export default Puzzle; 
+export default Puzzle;
