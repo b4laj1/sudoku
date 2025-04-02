@@ -1,0 +1,281 @@
+:root {
+  --primary-green: #2c5f2d;
+  --secondary-green: #1e441e;
+  --light-green: #97bc62;
+  --accent-green: #5fa052;
+  --pure-white: #ffffff;
+  --off-white: #f9f9f9;
+  --light-gray: #e0e0e0;
+  --dark-gray: #333333;
+  --black: #000000;
+}
+
+.container {
+  max-width: 650px;
+  margin: 40px auto;
+  padding: 40px;
+  text-align: center;
+  background-color: var(--off-white);
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(to right, var(--primary-green), var(--light-green), var(--primary-green));
+}
+
+h1 {
+  font-size: 2.8em;
+  margin-bottom: 25px;
+  color: var(--primary-green);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(to right, transparent, var(--accent-green), transparent);
+}
+
+/* Timer positioning and alignment */
+.timer-container {
+  display: flex;
+  justify-content: center;
+  margin: 25px 0;
+}
+
+.timer {
+  font-size: 28px;
+  color: var(--primary-green);
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 12px 25px;
+  border-radius: 50px;
+  background-color: var(--pure-white);
+  box-shadow: 0 6px 15px rgba(44, 95, 45, 0.15);
+  border: 2px solid var(--light-green);
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0; /* Remove margin from timer itself */
+}
+
+.timer::before {
+  content: "⏱️";
+  margin-right: 10px;
+  font-size: 24px;
+}
+
+.timer::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, var(--primary-green), var(--light-green));
+  opacity: 0.7;
+}
+
+.puzzle-grid {
+  display: inline-block;
+  background-color: var(--secondary-green);
+  padding: 3px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(44, 95, 45, 0.25);
+  margin: 35px auto;
+  border: 3px solid var(--secondary-green);
+}
+
+.row {
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.cell {
+  width: 45px;
+  height: 45px;
+  text-align: center;
+  font-size: 1.4em;
+  background-color: var(--pure-white);
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: var(--dark-gray);
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--light-gray);
+  box-sizing: border-box;
+}
+
+/* 3×3 grid separation */
+.row:nth-child(3) .cell, 
+.row:nth-child(6) .cell {
+  border-bottom: 3px solid var(--secondary-green);
+}
+
+.row .cell:nth-child(3), 
+.row .cell:nth-child(6) {
+  border-right: 3px solid var(--secondary-green);
+}
+
+/* Fix outer borders */
+.row:first-child .cell {
+  border-top: 1px solid var(--light-gray);
+}
+
+.row .cell:first-child {
+  border-left: 1px solid var(--light-gray);
+}
+
+.row:last-child .cell {
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.row .cell:last-child {
+  border-right: 1px solid var(--light-gray);
+}
+
+.cell.fixed {
+  background-color: #e9f5e9;
+  color: var(--primary-green);
+  font-weight: bold;
+}
+
+.cell:focus {
+  outline: none;
+  border-color: var(--accent-green);
+  box-shadow: 0 0 10px rgba(95, 160, 82, 0.5);
+  transform: scale(1.05);
+  z-index: 2;
+}
+
+.cell:hover:not(:disabled) {
+  background-color: #f0f9f0;
+  transform: scale(1.03);
+}
+
+.cell::-webkit-inner-spin-button,
+.cell::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Button container for alignment */
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.submit-button {
+  padding: 16px 38px;
+  font-size: 18px;
+  background: linear-gradient(to right, var(--primary-green), var(--accent-green));
+  color: var(--pure-white);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 1px;
+  box-shadow: 0 8px 20px rgba(44, 95, 45, 0.3);
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  margin: 0; /* Remove margin from button itself */
+}
+
+.submit-button::before {
+  content: "✓ ";
+  font-weight: bold;
+}
+
+.submit-button:hover {
+  background: linear-gradient(to right, var(--secondary-green), var(--primary-green));
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(44, 95, 45, 0.4);
+}
+
+.submit-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 5px 15px rgba(44, 95, 45, 0.3);
+}
+
+.submit-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: translateX(-100%);
+}
+
+.submit-button:hover::after {
+  transition: transform 0.8s ease;
+  transform: translateX(100%);
+}
+
+/* Pulse animation for the timer to draw attention to it */
+@keyframes timerPulse {
+  0% { box-shadow: 0 6px 15px rgba(44, 95, 45, 0.15); }
+  50% { box-shadow: 0 6px 20px rgba(44, 95, 45, 0.25); }
+  100% { box-shadow: 0 6px 15px rgba(44, 95, 45, 0.15); }
+}
+
+.timer {
+  animation: timerPulse 2s infinite ease-in-out;
+}
+
+/* Add a satisfying "pop" animation when a cell is filled */
+@keyframes cellPop {
+  0% {transform: scale(1);}
+  50% {transform: scale(1.1);}
+  100% {transform: scale(1);}
+}
+
+.cell:not(:disabled):valid {
+  animation: cellPop 0.3s ease-out;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+  
+  .cell {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1em;
+  }
+  
+  h1 {
+    font-size: 2.2em;
+  }
+  
+  .timer {
+    font-size: 22px;
+  }
+}
