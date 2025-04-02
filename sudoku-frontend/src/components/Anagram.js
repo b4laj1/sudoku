@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import './styles/Puzzle.css';
+import './styles/Anagram.css';
 
-function Puzzle() {
+function Anagram() {
   const { orgId } = useParams();
   const navigate = useNavigate();
-  const [puzzle, setPuzzle] = useState(null);
+  const [puzzle, setPuzzle] = useState([]);
   const [solution, setSolution] = useState([]);
   const [puzzleId, setPuzzleId] = useState(null);
   const [timer, setTimer] = useState(0);
@@ -16,14 +16,13 @@ function Puzzle() {
     fetch(`http://localhost:5000/api/puzzle?orgId=${orgId}`)
       .then(res => res.json())
       .then(data => {
-        if (data.puzzle_type === 'sudoku') {
+        if (data.puzzle_type === 'anagram') {
           setPuzzle(data.puzzle);
           setPuzzleId(data.id);
-          const initialSolution = data.puzzle.map(row => [...row]);
-          setSolution(initialSolution);
+          setSolution(data.puzzle.map(() => ''));
           setLoading(false);
         } else {
-          navigate(`/anagram/${orgId}`);
+          navigate(`/puzzle/${orgId}`);
         }
       })
       .catch(err => console.error('Error fetching puzzle:', err));
@@ -39,10 +38,9 @@ function Puzzle() {
     }
   }, [loading]);
 
-  const handleCellChange = (rowIndex, colIndex, value) => {
-    const newValue = value === '' ? 0 : Math.min(9, Math.max(1, parseInt(value) || 0));
+  const handleCellChange = (index, value) => {
     const newSolution = [...solution];
-    newSolution[rowIndex][colIndex] = newValue;
+    newSolution[index] = value;
     setSolution(newSolution);
   };
 
@@ -78,35 +76,24 @@ function Puzzle() {
 
   return (
     <div className="container">
-      <h1>Sudoku Challenge</h1>
-      <div class="timer-container">
-        <div class="timer">Time: {formatTime(timer)}</div>
-      </div>
-      <div className="puzzle-grid">
-        {solution.map((row, rowIndex) => (
-          <div key={rowIndex} className="row">
-            {row.map((cell, colIndex) => (
-              <input
-                key={`${rowIndex}-${colIndex}`}
-                type="number"
-                min="1"
-                max="9"
-                value={cell || ''}
-                onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
-                disabled={puzzle[rowIndex][colIndex] !== 0}
-                className={`cell ${puzzle[rowIndex][colIndex] !== 0 ? 'fixed' : ''}`}
-              />
-            ))}
+      <h1>Anagram Challenge</h1>
+      <div className="timer">Time: {formatTime(timer)}</div>
+      <div className="anagram-grid">
+        {puzzle.map((word, index) => (
+          <div key={index} className="anagram-item">
+            <span className="anagram-word">{word}</span>
+            <input
+              type="text"
+              value={solution[index]}
+              onChange={(e) => handleCellChange(index, e.target.value)}
+              className="anagram-input"
+            />
           </div>
         ))}
       </div>
-      <div class="button-container">
-        <button onClick={handleSubmit} className="submit-button">
-          Submit Solution
-        </button>
-      </div>
+      <button className="submit-button" onClick={handleSubmit}>Submit Solution</button>
     </div>
   );
 }
 
-export default Puzzle;
+export default Anagram;

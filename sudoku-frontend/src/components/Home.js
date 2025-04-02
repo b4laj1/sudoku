@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './styles/Home.css';
 
 function Home() {
   const [orgId, setOrgId] = useState('');
@@ -17,8 +18,8 @@ function Home() {
       <h1>Sudoku Challenge</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="orgId">Enter Organization ID:</label>
-          <input
+          <label htmlFor="orgId">Enter Corp ID:</label>
+          <input 
             type="text"
             id="orgId"
             value={orgId}
